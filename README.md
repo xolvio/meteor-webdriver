@@ -24,3 +24,6 @@ A Velocity test package that combines webdriver  with a test framework for UI te
 - [ ] Allow you to sepcify the browser matrix to run in development
 - [ ] Allow you to sepcify the browser matrix to run in continous integration
 - [ ] SauceLabs & BrowserStack support
+
+
+The driver (excuse the pun) behind this package is to allow a single testing "language" such as jasmine or mocha to be used across the entire testing stack. I will also be using this package in [The Meteor Testing Manual](www.meteortesting.com) book.
