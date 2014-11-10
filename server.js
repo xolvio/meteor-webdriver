@@ -1,16 +1,28 @@
-webdriverio = Npm.require('webdriverio');
+/*jshint -W117, -W030, -W016 */
+/* global
+ DEBUG:true
+ */
 
-var options = {
-  desiredCapabilities: {
-    browserName: 'firefox'
+wdio = {};
+
+DEBUG = !!process.env.VELOCITY_DEBUG;
+
+(function () {
+  'use strict';
+
+  if (process.env.NODE_ENV !== 'development' || process.env.VELOCITY === '0' || process.env.IS_MIRROR) {
+    return;
   }
-};
 
-//webdriverio
-//  .remote(options)
-//  .init()
-//  .url('http://www.google.com')
-//  .title(function (err, res) {
-//    console.log('Title was: ' + res.value);
-//  })
-//  .end();
+  wdio.instance = Npm.require('webdriverio');
+
+  wdio.chai = Npm.require('chai');
+
+  wdio.getGhostDriverClient = function (options) {
+    // TODO find the phantomjs installation
+    // exec phantomjs --webdriver 4444
+    wdio.client = wdio.instance.remote(options).init();
+    return wdio.client;
+  };
+
+})();
