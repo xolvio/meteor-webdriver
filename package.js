@@ -8,13 +8,15 @@ Package.describe({
 
 Npm.depends({
   'webdriverio': '2.2.3',
-  'wd': '0.3.9',
-  'selenium-webdriver': '2.43.5',
-  //'selenium-standalone': '2.43.1-5',
   'phantomjs': '1.9.12',
+  'chai': '1.9.0'
+
+  // TODO add support for these
+  //'selenium-standalone': '2.43.1-5',
+  //'selenium-webdriver': '2.43.5',
+  //'wd': '0.3.9',
   //'jasmine-core': '2.0.0',
   //'mocha': '1.17.1',
-  'chai': '1.9.0'
 });
 
 Package.onUse(function (api) {
