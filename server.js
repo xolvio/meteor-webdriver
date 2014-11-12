@@ -50,13 +50,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     phantomProc.stdout.setEncoding('utf8');
     var onPhantomData = Meteor.bindEnvironment(function (data) {
       if (data.match(/running/i)) {
-        console.log('PhantomJS started.');
+        console.log('[webdriver] PhantomJS started.');
         wdio.singletons.upsert({_id: 'phantomPid'}, {_id: 'phantomPid', value: phantomProc.pid});
         phantomProc.stdout.removeListener('data', onPhantomData);
         next(null, phantomProc);
       }
       else if (data.match(/error/i)) {
-        console.error('Error starting PhantomJS');
+        console.error('[webdriver] Error starting PhantomJS');
         next(new Error(data));
       }
     });
@@ -68,16 +68,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     if (!pid) {
       return false;
     }
-    DEBUG && console.log('Checking if Phantom is running with pid', pid);
+    DEBUG && console.log('[webdriver] Checking if Phantom is running with pid', pid);
     try {
       process.kill(pid.value, 0);
-      DEBUG && console.log('PhantomJS is already running');
+      DEBUG && console.log('[webdriver] PhantomJS is already running');
       return true;
     } catch (e) {
-      DEBUG && console.log('PhantomJS is not running');
+      DEBUG && console.log('[webdriver] PhantomJS is not running');
       return false;
     }
-
   }
 
 })();
