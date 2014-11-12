@@ -3,7 +3,10 @@
  DEBUG:true
  */
 
-wdio = {};
+wdio = {
+  singletons: new Meteor.Collection('wdioSingletons')
+};
+
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
 
@@ -14,19 +17,22 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
-  var phantom = Npm.require('phantomjs');
-  var childProcess = Npm.require('child_process');
+  var phantom = Npm.require('phantomjs'),
+      childProcess = Npm.require('child_process');
 
   wdio.instance = Npm.require('webdriverio');
 
-  wdio.getBrowser = function (options, callback) {
-    // TODO automatically start ghost driver if it hasn't been started
-    //_startPhantom(4444, {}, function () {
-    callback(wdio.instance.remote(options));
-    //});
+  wdio.getGhostDriver = function (options, callback) {
+    _startPhantom(options.port, {}, function () {
+      callback(wdio.instance.remote(options));
+    });
   };
 
   function _startPhantom (port, opts, next) {
+    if (_phantomStarted()) {
+      next();
+      return;
+    }
     var phantomOpts = opts.phantomFlags || [];
     phantomOpts.push('--webdriver', port);
     if (opts.ignoreSslErrors) {
@@ -36,16 +42,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     var stopPhantomProc = function () {
       phantomProc.kill();
     };
-    // stop child phantomjs process when interrupting master process
     process.on('SIGINT', stopPhantomProc);
 
     phantomProc.on('exit', function () {
       process.removeListener('SIGINT', stopPhantomProc);
     });
     phantomProc.stdout.setEncoding('utf8');
-    var onPhantomData = function (data) {
+    var onPhantomData = Meteor.bindEnvironment(function (data) {
       if (data.match(/running/i)) {
         console.log('PhantomJS started.');
+        wdio.singletons.upsert({_id: 'phantomPid'}, {_id: 'phantomPid', value: phantomProc.pid});
         phantomProc.stdout.removeListener('data', onPhantomData);
         next(null, phantomProc);
       }
@@ -53,8 +59,25 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         console.error('Error starting PhantomJS');
         next(new Error(data));
       }
-    };
+    });
     phantomProc.stdout.on('data', onPhantomData);
+  }
+
+  function _phantomStarted () {
+    var pid = wdio.singletons.findOne('phantomPid');
+    if (!pid) {
+      return false;
+    }
+    DEBUG && console.log('Checking if Phantom is running with pid', pid);
+    try {
+      process.kill(pid.value, 0);
+      DEBUG && console.log('PhantomJS is already running');
+      return true;
+    } catch (e) {
+      DEBUG && console.log('PhantomJS is not running');
+      return false;
+    }
+
   }
 
 })();
