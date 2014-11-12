@@ -25,7 +25,7 @@
 
   Package.onUse(function (api) {
     api.use(['velocity:core@1.0.0-rc.1'], 'server');
-    api.use(['templating'], 'client');
+    api.use(['templating@1.0.9'], 'client');
 
     api.addFiles(['server.js'], 'server');
 
