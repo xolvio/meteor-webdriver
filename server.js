@@ -39,13 +39,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       phantomOpts.push('--ignore-ssl-errors', 'yes');
     }
     var phantomProc = childProcess.execFile(phantom.path, phantomOpts);
-    var stopPhantomProc = function () {
+    wdio.stopPhantomProc = function () {
       phantomProc.kill();
     };
-    process.on('SIGINT', stopPhantomProc);
+    process.on('SIGINT', wdio.stopPhantomProc);
 
     phantomProc.on('exit', function () {
-      process.removeListener('SIGINT', stopPhantomProc);
+      process.removeListener('SIGINT', wdio.stopPhantomProc);
     });
     phantomProc.stdout.setEncoding('utf8');
     var onPhantomData = Meteor.bindEnvironment(function (data) {

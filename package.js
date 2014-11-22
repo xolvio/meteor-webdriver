@@ -5,7 +5,7 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.0.1',
+    version: '0.0.3',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
@@ -24,7 +24,7 @@
   });
 
   Package.onUse(function (api) {
-    api.use(['velocity:core@1.0.0-rc.1'], 'server');
+    api.use('mongo@1.0.8');
     api.use(['templating@1.0.9'], 'client');
 
     api.addFiles(['server.js'], 'server');
