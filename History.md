@@ -1,3 +1,6 @@
+#0.0.4
+Fixed phantom message
+
 #0.0.3
 No longer depends on Velocity
 

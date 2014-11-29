@@ -56,7 +56,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         next(null, phantomProc);
       }
       else if (data.match(/error/i)) {
-        console.error('[webdriver] Error starting PhantomJS');
+        // FIXME this is not always true
+        //console.error('[webdriver] Error starting PhantomJS');
+        console.log('[webdriver] PhantomJS already started');
         next(new Error(data));
       }
     });
