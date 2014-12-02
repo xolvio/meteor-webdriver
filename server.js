@@ -24,11 +24,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   wdio.getGhostDriver = function (options, callback) {
     _startPhantom(options.port, {}, function () {
-      callback(wdio.instance.remote(options));
+
+      var browser = wdio.instance.remote(options);
+      // TODO patch browser.call to use Meteor.bindEnvironment
+      callback(browser);
     });
   };
 
-  function _startPhantom (port, opts, next) {
+
+  var _startPhantom = Meteor.bindEnvironment(function  (port, opts, next) {
     if (_phantomStarted()) {
       next();
       return;
@@ -58,14 +62,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       else if (data.match(/error/i)) {
         // FIXME this is not always true
         //console.error('[webdriver] Error starting PhantomJS');
-        console.log('[webdriver] PhantomJS already started');
+        //console.log('[webdriver] PhantomJS already started');
         next(new Error(data));
       }
     });
     phantomProc.stdout.on('data', onPhantomData);
-  }
+  });
 
-  function _phantomStarted () {
+  var _phantomStarted = Meteor.bindEnvironment(function() {
     var pid = wdio.singletons.findOne('phantomPid');
     if (!pid) {
       return false;
@@ -79,6 +83,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       DEBUG && console.log('[webdriver] PhantomJS is not running');
       return false;
     }
-  }
+  });
 
 })();
