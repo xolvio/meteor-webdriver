@@ -25,7 +25,7 @@
 
   Package.onUse(function (api) {
     api.use(['templating@1.0.9'], 'client');
-    api.use('coffeescript', 'server');
+    api.use('coffeescript@1.0.4', 'server');
     api.use('practicalmeteor:loglevel@1.1.0_2', 'server');
 
 

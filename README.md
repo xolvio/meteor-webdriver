@@ -25,7 +25,7 @@ meteor add xolvio:webdriver
   // getGhostDriver starts a new PhantomJS process in webdriver mode and returns a connected browser instance
   wdio.getGhostDriver(options, function(browser) {
     runTests(browser);
-  );
+  });
   
   // You're ready to write you tests here. See http://webdriver.io for the full API details
   function runTests(browser) {
