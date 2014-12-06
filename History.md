@@ -1,3 +1,8 @@
+#0.1.0
+
+* Actually using semvar now
+* Replaced process starting with practicalmeteor ChildProcessFactory
+
 #0.0.4
 Fixed phantom message
 

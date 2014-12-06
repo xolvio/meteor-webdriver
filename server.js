@@ -3,10 +3,9 @@
  DEBUG:true
  */
 
-wdio = {
-  singletons: new Meteor.Collection('wdioSingletons')
-};
+log = loglevel.createPackageLogger('[xolvio:webdriver]', process.env.WEBDRIVER_LOG_LEVEL || 'info');
 
+wdio = {};
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
 
@@ -17,68 +16,45 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
-  var phantom = Npm.require('phantomjs'),
-      childProcess = Npm.require('child_process');
+  var phantom = Npm.require('phantomjs');
 
   wdio.instance = Npm.require('webdriverio');
 
   wdio.getGhostDriver = function (options, callback) {
-    _startPhantom(options.port, {}, function () {
+    _startPhantom(options.port, function () {
       callback(wdio.instance.remote(options));
     });
   };
 
-  function _startPhantom (port, opts, next) {
-    if (_phantomStarted()) {
+
+  function _startPhantom (port, next) {
+
+    var cpf = practical.ChildProcessFactory.get();
+    var phantomSpawnOptions = {
+      taskName: 'phantom',
+      command: phantom.path,
+      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]
+    };
+
+    if (cpf.isRunning(phantomSpawnOptions.taskName)) {
       next();
       return;
     }
-    var phantomOpts = opts.phantomFlags || [];
-    phantomOpts.push('--webdriver', port);
-    if (opts.ignoreSslErrors) {
-      phantomOpts.push('--ignore-ssl-errors', 'yes');
-    }
-    var phantomProc = childProcess.execFile(phantom.path, phantomOpts);
-    wdio.stopPhantomProc = function () {
-      phantomProc.kill();
-    };
-    process.on('SIGINT', wdio.stopPhantomProc);
 
-    phantomProc.on('exit', function () {
-      process.removeListener('SIGINT', wdio.stopPhantomProc);
-    });
-    phantomProc.stdout.setEncoding('utf8');
+    var phantomChild = cpf.spawnSingleton(phantomSpawnOptions);
     var onPhantomData = Meteor.bindEnvironment(function (data) {
-      if (data.match(/running/i)) {
-        console.log('[webdriver] PhantomJS started.');
-        wdio.singletons.upsert({_id: 'phantomPid'}, {_id: 'phantomPid', value: phantomProc.pid});
-        phantomProc.stdout.removeListener('data', onPhantomData);
-        next(null, phantomProc);
+      var stdout = data.toString();
+      if (stdout.match(/running/i)) {
+        console.log('[xolvio:webdriver] PhantomJS started.');
+        phantomChild.stdout.removeListener('data', onPhantomData);
+        next();
       }
-      else if (data.match(/error/i)) {
-        // FIXME this is not always true
-        //console.error('[webdriver] Error starting PhantomJS');
-        console.log('[webdriver] PhantomJS already started');
+      else if (stdout.match(/error/i)) {
+        console.error('[xolvio:webdriver] Error starting PhantomJS');
         next(new Error(data));
       }
     });
-    phantomProc.stdout.on('data', onPhantomData);
-  }
-
-  function _phantomStarted () {
-    var pid = wdio.singletons.findOne('phantomPid');
-    if (!pid) {
-      return false;
-    }
-    DEBUG && console.log('[webdriver] Checking if Phantom is running with pid', pid);
-    try {
-      process.kill(pid.value, 0);
-      DEBUG && console.log('[webdriver] PhantomJS is already running');
-      return true;
-    } catch (e) {
-      DEBUG && console.log('[webdriver] PhantomJS is not running');
-      return false;
-    }
+    phantomChild.stdout.on('data', onPhantomData);
   }
 
 })();

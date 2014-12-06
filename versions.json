@@ -1,15 +1,7 @@
 {
   "dependencies": [
     [
-      "application-configuration",
-      "1.0.3"
-    ],
-    [
       "base64",
-      "1.0.1"
-    ],
-    [
-      "binary-heap",
       "1.0.1"
     ],
     [
@@ -17,16 +9,8 @@
       "2.0.3"
     ],
     [
-      "callback-hook",
-      "1.0.1"
-    ],
-    [
-      "check",
-      "1.0.2"
-    ],
-    [
-      "ddp",
-      "1.0.11"
+      "coffeescript",
+      "1.0.4"
     ],
     [
       "deps",
@@ -35,10 +19,6 @@
     [
       "ejson",
       "1.0.4"
-    ],
-    [
-      "follower-livedata",
-      "1.0.2"
     ],
     [
       "geojson-utils",
@@ -61,20 +41,12 @@
       "1.0.1"
     ],
     [
-      "logging",
-      "1.0.5"
-    ],
-    [
       "meteor",
       "1.1.3"
     ],
     [
       "minimongo",
       "1.0.5"
-    ],
-    [
-      "mongo",
-      "1.0.8"
     ],
     [
       "observe-sequence",
@@ -85,6 +57,10 @@
       "1.0.1"
     ],
     [
+      "practicalmeteor:loglevel",
+      "1.1.0_2"
+    ],
+    [
       "random",
       "1.0.1"
     ],
@@ -93,8 +69,8 @@
       "1.0.3"
     ],
     [
-      "retry",
-      "1.0.1"
+      "spacejamio:chai",
+      "1.9.2_2"
     ],
     [
       "templating",

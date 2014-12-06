@@ -5,7 +5,7 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.0.4',
+    version: '0.1.0',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
@@ -24,10 +24,15 @@
   });
 
   Package.onUse(function (api) {
-    api.use('mongo@1.0.8');
     api.use(['templating@1.0.9'], 'client');
+    api.use('coffeescript', 'server');
+    api.use('practicalmeteor:loglevel@1.1.0_2', 'server');
 
-    api.addFiles(['server.js'], 'server');
+
+    api.addFiles(['' +
+    'lib/ChildProcessFactory.coffee',
+      'server.js'
+    ], 'server');
 
     api.export('wdio', 'server');
   });
