@@ -57,8 +57,12 @@
       "1.0.1"
     ],
     [
+      "practicalmeteor:chai",
+      "1.9.2_3"
+    ],
+    [
       "practicalmeteor:loglevel",
-      "1.1.0_2"
+      "1.1.0_3"
     ],
     [
       "random",
@@ -67,10 +71,6 @@
     [
       "reactive-var",
       "1.0.3"
-    ],
-    [
-      "spacejamio:chai",
-      "1.9.2_2"
     ],
     [
       "templating",
@@ -86,6 +86,6 @@
     ]
   ],
   "pluginDependencies": [],
-  "toolVersion": "meteor-tool@1.0.35",
+  "toolVersion": "meteor-tool@1.0.36",
   "format": "1.0"
 }

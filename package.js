@@ -12,7 +12,8 @@
 
   Npm.depends({
     'webdriverio': '2.2.3',
-    'phantomjs': '1.9.12'
+    'phantomjs': '1.9.12',
+    'fs-extra': '0.12.0'
 
     // TODO add support for these
     //'chai': '1.9.0'
@@ -28,11 +29,12 @@
     api.use('coffeescript@1.0.4', 'server');
     api.use('practicalmeteor:loglevel@1.1.0_2', 'server');
 
-
-    api.addFiles(['' +
-    'lib/ChildProcessFactory.coffee',
+    api.addFiles([
+      'lib/meteor/files.js',
+      'lib/LongRunningChildProcess.coffee',
       'server.js'
     ], 'server');
+    api.addFiles(['lib/spawnScript.js'], 'server', {isAsset: true});
 
     api.export('wdio', 'server');
   });

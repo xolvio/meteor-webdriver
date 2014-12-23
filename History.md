@@ -1,3 +1,7 @@
+#0.1.1
+
+* Fixed Phantom spawning and timing issues
+
 #0.1.0
 
 * Actually using semvar now

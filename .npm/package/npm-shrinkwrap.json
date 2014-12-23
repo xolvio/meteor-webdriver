@@ -1,5 +1,27 @@
 {
   "dependencies": {
+    "fs-extra": {
+      "version": "0.12.0",
+      "dependencies": {
+        "ncp": {
+          "version": "0.6.0"
+        },
+        "mkdirp": {
+          "version": "0.5.0",
+          "dependencies": {
+            "minimist": {
+              "version": "0.0.8"
+            }
+          }
+        },
+        "jsonfile": {
+          "version": "2.0.0"
+        },
+        "rimraf": {
+          "version": "2.2.8"
+        }
+      }
+    },
     "phantomjs": {
       "version": "1.9.12",
       "dependencies": {

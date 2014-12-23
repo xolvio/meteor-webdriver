@@ -21,6 +21,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   wdio.instance = Npm.require('webdriverio');
 
   wdio.getGhostDriver = function (options, callback) {
+    DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
     _startPhantom(options.port, function () {
       callback(wdio.instance.remote(options));
     });
@@ -29,32 +30,42 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _startPhantom (port, next) {
 
-    var cpf = practical.ChildProcessFactory.get();
-    var phantomSpawnOptions = {
-      taskName: 'phantom',
-      command: phantom.path,
-      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]
-    };
-
-    if (cpf.isRunning(phantomSpawnOptions.taskName)) {
+    var phantomChild = new sanjo.LongRunningChildProcess('webdriver-phantom');
+    if (phantomChild.isRunning()) {
+      DEBUG && console.log('[xolvio:webdriver] Phantom is already running, not starting a new one');
       next();
       return;
     }
 
-    var phantomChild = cpf.spawnSingleton(phantomSpawnOptions);
+    phantomChild.spawn({
+      command: phantom.path,
+      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port],
+      options: {
+        silent: true,
+        detached: true,
+        cwd: process.env.PWD
+      }
+    });
+
+    DEBUG && console.log('[xolvio:webdriver] Starting Phantom.');
     var onPhantomData = Meteor.bindEnvironment(function (data) {
       var stdout = data.toString();
+      DEBUG && console.log('[xolvio:webdriver][phantom output]', stdout);
       if (stdout.match(/running/i)) {
+        // always show this message
         console.log('[xolvio:webdriver] PhantomJS started.');
-        phantomChild.stdout.removeListener('data', onPhantomData);
-        next();
+        phantomChild.getChild().stdout.removeListener('data', onPhantomData);
+        //Meteor.setTimeout(function() {
+          next();
+        //},500);
+
       }
-      else if (stdout.match(/error/i)) {
+      else if (stdout.match(/Error/)) {
         console.error('[xolvio:webdriver] Error starting PhantomJS');
         next(new Error(data));
       }
     });
-    phantomChild.stdout.on('data', onPhantomData);
+    phantomChild.getChild().stdout.on('data', onPhantomData);
   }
 
 })();
