@@ -1,6 +1,10 @@
-#0.1.1
+#0.1.3
 
 * Fixed Phantom spawning and timing issues
+
+#0.1.1 - 0.1.2
+
+* Void (connection issues messed up build on package server)
 
 #0.1.0
 
