@@ -1,3 +1,11 @@
+#0.1.5
+
+* Using latest LongRunningChildProcess from Sanjo
+
+#0.1.4
+
+* Update to the spawn approach
+
 #0.1.3
 
 * Fixed Phantom spawning and timing issues

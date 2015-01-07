@@ -3,9 +3,9 @@ path = Npm.require 'path'
 assert = Npm.require 'assert'
 spawn = Npm.require('child_process').spawn
 
-@sanjo ?= {}
+@sanjo3 ?= {}
 
-class sanjo.LongRunningChildProcess
+class sanjo3.LongRunningChildProcess
 
   taskName: null
   child: null
@@ -129,12 +129,12 @@ class sanjo.LongRunningChildProcess
     @fout = fs.openSync(logFile, 'w')
     #@ferr = fs.openSync(logFile, 'w')
 
-    spawnOptions = options.options || {
+    spawnOptions = _.defaults(options.options, {
       cwd: @_getMeteorAppPath(),
       env: process.env,
       detached: true,
       stdio: ['ignore', @fout, @fout]
-    }
+    })
 
 
     command = path.basename options.command
@@ -146,7 +146,8 @@ class sanjo.LongRunningChildProcess
 
     log.debug("LongRunningChildProcess.spawn is spawning '#{command}'")
 
-    @child = spawn('node', commandArgs, spawnOptions)
+    nodePath = process.execPath
+    @child = spawn(nodePath, commandArgs, spawnOptions)
     @dead = false
     @_setPid(@child.pid)
 

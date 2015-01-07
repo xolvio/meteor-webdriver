@@ -1,6 +1,7 @@
 /*jshint -W117, -W030, -W016 */
 /* global
- DEBUG:true
+ DEBUG:true,
+ sanjo3:true
  */
 
 log = loglevel.createPackageLogger('[xolvio:webdriver]', process.env.WEBDRIVER_LOG_LEVEL || 'info');
@@ -30,7 +31,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _startPhantom (port, next) {
 
-    var phantomChild = new sanjo.LongRunningChildProcess('webdriver-phantom');
+    var phantomChild = new sanjo3.LongRunningChildProcess('webdriver-phantom');
     if (phantomChild.isRunning()) {
       DEBUG && console.log('[xolvio:webdriver] Phantom is already running, not starting a new one');
       next();
@@ -55,10 +56,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         // always show this message
         console.log('[xolvio:webdriver] PhantomJS started.');
         phantomChild.getChild().stdout.removeListener('data', onPhantomData);
-        //Meteor.setTimeout(function() {
-          next();
-        //},500);
-
+        next();
       }
       else if (stdout.match(/Error/)) {
         console.error('[xolvio:webdriver] Error starting PhantomJS');
