@@ -132,8 +132,8 @@ class sanjo3.LongRunningChildProcess
     spawnOptions = _.defaults(options.options, {
       cwd: @_getMeteorAppPath(),
       env: process.env,
-      detached: true,
-      stdio: ['ignore', @fout, @fout]
+      detached: true
+#      stdio: ['ignore', @fout, @fout]
     })
 
 
