@@ -5,7 +5,7 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.1.5',
+    version: '0.1.6',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
