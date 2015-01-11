@@ -16,13 +16,14 @@ meteor add xolvio:webdriver
 
 ```javascript
 
-describe('End to end tests', function() {
+describe('Browser testing', function(done) {
 
   var browser;  
 
-  before(function() {
+  before(function(done) {
     wdio.getGhostDriver(function(browzer) {
       browser = browzer;
+      done();
     });
   })
 
@@ -35,7 +36,7 @@ describe('End to end tests', function() {
       }).
       end().
       call(done);
-  }
+  });
   
 });
   
