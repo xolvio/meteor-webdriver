@@ -1,3 +1,7 @@
+#0.1.6
+
+* Fixed issue in child process 
+
 #0.1.5
 
 * Using latest LongRunningChildProcess from Sanjo

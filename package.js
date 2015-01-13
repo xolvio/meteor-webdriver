@@ -25,6 +25,7 @@
   });
 
   Package.onUse(function (api) {
+    api.use('underscore@1.0.2', 'server');
     api.use('coffeescript@1.0.4', 'server');
     api.use('practicalmeteor:loglevel@1.1.0_2', 'server');
 

@@ -19,9 +19,22 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   var phantom = Npm.require('phantomjs');
 
+  var defaultOptions = {
+    desiredCapabilities: {browserName: 'PhantomJs'},
+    port: 4444,
+    logLevel: 'silent'
+  };
+
   wdio.instance = Npm.require('webdriverio');
 
   wdio.getGhostDriver = function (options, callback) {
+
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    options = _.defaults(options, defaultOptions);
+
     DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
     _startPhantom(options.port, function () {
       callback(wdio.instance.remote(options));
