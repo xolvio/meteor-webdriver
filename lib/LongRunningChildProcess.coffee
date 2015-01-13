@@ -74,7 +74,7 @@ class sanjo3.LongRunningChildProcess
 
 
   _getMeteorAppPath: ->
-    @appPath = path.resolve(findAppDir()) if not @appPath
+    @appPath = path.resolve(xFindAppDir()) if not @appPath
     return @appPath
 
 
@@ -92,7 +92,7 @@ class sanjo3.LongRunningChildProcess
 
   _getSpawnScriptPath: ->
     path.join(@_getMeteorLocalPath(),
-      'build/programs/server/assets/packages/velocity_node-soft-mirror/lib/spawnScript.js'
+      'build/programs/server/assets/packages/xolvio_webdriver/libs/spawner.js'
     )
 
 

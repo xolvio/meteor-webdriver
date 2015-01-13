@@ -221,13 +221,13 @@
       }
     },
     "webdriverio": {
-      "version": "2.2.3",
+      "version": "2.4.2",
       "dependencies": {
         "archiver": {
           "version": "0.6.1",
           "dependencies": {
             "readable-stream": {
-              "version": "1.0.33-1",
+              "version": "1.0.33",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.1"
@@ -359,6 +359,9 @@
         "pragma-singleton": {
           "version": "1.0.3"
         },
+        "q": {
+          "version": "1.1.2"
+        },
         "request": {
           "version": "2.34.0",
           "dependencies": {
@@ -372,7 +375,7 @@
               "version": "0.5.2"
             },
             "node-uuid": {
-              "version": "1.4.1"
+              "version": "1.4.2"
             },
             "mime": {
               "version": "1.2.11"
@@ -381,7 +384,7 @@
               "version": "0.12.1",
               "dependencies": {
                 "punycode": {
-                  "version": "1.3.1"
+                  "version": "1.3.2"
                 }
               }
             },
@@ -389,7 +392,7 @@
               "version": "0.1.4",
               "dependencies": {
                 "combined-stream": {
-                  "version": "0.0.5",
+                  "version": "0.0.7",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "0.0.5"
@@ -402,16 +405,16 @@
               "version": "0.3.0"
             },
             "http-signature": {
-              "version": "0.10.0",
+              "version": "0.10.1",
               "dependencies": {
                 "assert-plus": {
-                  "version": "0.1.2"
+                  "version": "0.1.5"
                 },
                 "asn1": {
                   "version": "0.1.11"
                 },
                 "ctype": {
-                  "version": "0.5.2"
+                  "version": "0.5.3"
                 }
               }
             },
@@ -444,10 +447,10 @@
           "version": "0.1.0"
         },
         "url": {
-          "version": "0.10.1",
+          "version": "0.10.2",
           "dependencies": {
             "punycode": {
-              "version": "1.2.4"
+              "version": "1.3.2"
             }
           }
         },
