@@ -92,7 +92,7 @@ class sanjo3.LongRunningChildProcess
 
   _getSpawnScriptPath: ->
     path.join(@_getMeteorLocalPath(),
-      'build/programs/server/assets/packages/xolvio_webdriver/libs/spawner.js'
+      'build/programs/server/assets/packages/xolvio_webdriver/lib/spawner.js'
     )
 
 
