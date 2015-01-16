@@ -1,3 +1,11 @@
+#0.1.8
+
+* Hotfix: Path issue
+
+#0.1.7
+
+* Clash with Jasmine Spawner
+
 #0.1.6
 
 * Fixed issue in child process 

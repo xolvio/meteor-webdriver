@@ -5,7 +5,7 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.1.7',
+    version: '0.1.8',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
@@ -18,10 +18,9 @@
     // TODO add support for these
     //'chai': '1.9.0'
     //'selenium-standalone': '2.43.1-5',
+
     //'selenium-webdriver': '2.43.5',
     //'wd': '0.3.9',
-    //'jasmine-core': '2.0.0',
-    //'mocha': '1.17.1',
   });
 
   Package.onUse(function (api) {
