@@ -1,7 +1,7 @@
 meteor-webdriver
 ================
 
-A [webdriver.io](http://webdriver.io) for UI testing using any testing framework.
+A [webdriverIO](http://webdriver.io) for UI testing using any testing framework.
 
 1. Starts PhantomJS in webdriver mode
 2. Provides you with a browser you can automate using the industry standard Selenium Webdriver
@@ -18,17 +18,17 @@ meteor add xolvio:webdriver
 
 describe('Browser testing', function(done) {
 
-  var browser;  
+  var _browser;
 
   before(function(done) {
-    wdio.getGhostDriver(function(browzer) {
-      browser = browzer;
+    wdio.getGhostDriver(function(browser) {
+      _browser = browser;
       done();
     });
   })
 
   it('should have the correct title', function(done) {
-    browser.
+    _browser.
       init().
       url('http://www.google.com').
       title(function(err, res) {

@@ -1,3 +1,7 @@
+#0.2.0
+
+* WebdriverIO can now run inside a mirror
+
 #0.1.8
 
 * Hotfix: Path issue

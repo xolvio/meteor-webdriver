@@ -13,7 +13,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 (function () {
   'use strict';
 
-  if (process.env.NODE_ENV !== 'development' || process.env.VELOCITY === '0' || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== 'development' || process.env.VELOCITY === '0') {
     return;
   }
 
