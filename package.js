@@ -13,7 +13,8 @@
   Npm.depends({
     'webdriverio': '2.4.2',
     'phantomjs': '1.9.12',
-    'fs-extra': '0.12.0'
+    'fs-extra': '0.12.0',
+    'freeport':'1.0.4'
 
     // TODO add support for these
     //'chai': '1.9.0'
@@ -30,10 +31,8 @@
 
     api.addFiles([
       'lib/meteor/files.js',
-      'lib/LongRunningChildProcess.coffee',
       'server.js'
     ], 'server');
-    api.addFiles(['lib/spawner.js'], 'server', {isAsset: true});
 
     api.export('wdio', 'server');
   });
