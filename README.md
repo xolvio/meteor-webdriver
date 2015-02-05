@@ -37,12 +37,18 @@ describe('Browser testing', function(done) {
       end().
       call(done);
   });
-  
+
 });
-  
+
 ```
 
 For more examples and usage, see the [webdriver.io website](http://webdriver.io).
+
+## Phantom.js and CI
+
+If this package is included for testing your Meteor app, it should work fine out of the box. You may encounter issues when you try
+to run on the CI server, as it doesn't seem to detect the right phantom.js binary to download. You can instead just `npm install -g phantomjs`
+and then set `PHANTOM_PATH` as an environment variable when you run your Meteor CI test build.
 
 ## Package Roadmap
 
