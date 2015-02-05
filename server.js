@@ -19,6 +19,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   var phantom = Npm.require('phantomjs');
 
+  var phantomPath;
+
+  if (process.env.PHANTOM_PATH) {
+    phantomPath = process.env.PHANTOM_PATH;
+  } else {
+    phantomPath = phantom.path;
+  }
+
   var defaultOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},
     port: 4444,
@@ -52,7 +60,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     }
 
     phantomChild.spawn({
-      command: phantom.path,
+      command: phantomPath,
       args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port],
       options: {
         silent: true,
