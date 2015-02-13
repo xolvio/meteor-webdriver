@@ -1,4 +1,4 @@
-#0.2.1
+#0.2.1 / 0.2.2
 
 * Add a PHANTOM_PATH environment variable to help with CI environments.
 
