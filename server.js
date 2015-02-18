@@ -61,12 +61,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     phantomChild.spawn({
       command: phantomPath,
-      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port],
-      options: {
-        silent: true,
-        detached: true,
-        cwd: process.env.PWD
-      }
+      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]
     });
 
     DEBUG && console.log('[xolvio:webdriver] Starting Phantom.');

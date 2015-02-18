@@ -137,20 +137,16 @@ class sanjo3.LongRunningChildProcess
     @fout = fs.openSync(logFile, 'w')
     #@ferr = fs.openSync(logFile, 'w')
 
-    spawnOptions = _.defaults(options.options, {
+    spawnOptions = {
       cwd: @_getMeteorAppPath(),
       env: process.env,
-      detached: true
-#      stdio: ['ignore', @fout, @fout]
-    })
-
-
+      detached: true,
+      stdio: ['ignore', @fout, @fout]
+    }
     command = path.basename options.command
     spawnScript = @_getSpawnScriptPath()
-    log.debug spawnScript
     commandArgs = [spawnScript, @_getMeteorPid(), options.command].concat(options.args)
     fs.chmodSync(spawnScript, 0o544)
-
 
     log.debug("LongRunningChildProcess.spawn is spawning '#{command}'")
 
