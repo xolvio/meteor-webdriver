@@ -134,14 +134,14 @@ class sanjo3.LongRunningChildProcess
 
     logFile = @_getLogFilePath()
     fs.ensureDirSync(path.dirname(logFile))
-    @fout = fs.openSync(logFile, 'w')
+    #@fout = fs.openSync(logFile, 'w')
     #@ferr = fs.openSync(logFile, 'w')
 
     spawnOptions = {
       cwd: @_getMeteorAppPath(),
       env: process.env,
       detached: true,
-      stdio: ['ignore', @fout, @fout]
+      stdio: ['ignore', 'pipe', 'pipe']
     }
     command = path.basename options.command
     spawnScript = @_getSpawnScriptPath()

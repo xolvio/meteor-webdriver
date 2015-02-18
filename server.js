@@ -69,9 +69,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       var stdout = data.toString();
       DEBUG && console.log('[xolvio:webdriver][phantom output]', stdout);
       if (stdout.match(/running/i)) {
-        // always show this message
         console.log('[xolvio:webdriver] PhantomJS started.');
-        phantomChild.getChild().stdout.removeListener('data', onPhantomData);
         next();
       }
       else if (stdout.match(/Error/)) {
