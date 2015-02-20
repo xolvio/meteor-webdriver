@@ -17,17 +17,22 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
-  var phantom = Npm.require('phantomjs');
+  var phantom = Npm.require('phantomjs'),
+      path = Npm.require('path'),
+      _screenshotCounter;
 
   var defaultOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},
     port: 4444,
-    logLevel: 'silent'
+    logLevel: 'silent',
+    implicitWait: 5000
   };
 
   wdio.instance = Npm.require('webdriverio');
 
   wdio.getGhostDriver = function (options, callback) {
+
+    _screenshotCounter = 0;
 
     if (typeof options === 'function') {
       callback = options;
@@ -37,9 +42,49 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
     _startPhantom(options.port, function () {
-      callback(wdio.instance.remote(options));
+      var browser = wdio.instance.remote(options);
+      _augmentedBrowser(browser, options);
+      callback(browser);
     });
   };
+
+  function _augmentedBrowser (browser, options) {
+    browser.
+      addCommand('waitForPresent', function (selector, cb) {
+        this
+          .waitForExist(selector, options.implicitWait)
+          .waitForVisible(selector, options.implicitWait)
+          .call(cb);
+      }).
+      addCommand('waitForAndClick', function (selector, cb) {
+        this
+          .waitForPresent(selector)
+          .click(selector)
+          .call(cb);
+      }).
+      addCommand('type', function (selector, value, cb) {
+        this
+          .click(selector)
+          .keys(value)
+          .call(cb);
+      }).
+      addCommand('takeScreenshot', function (filename, cb) {
+        if (typeof filename === 'function') {
+          cb = filename;
+          filename = 'screenshot' + ++_screenshotCounter + '.png';
+        }
+        if (!filename.match(/\.png$/)) {
+          filename += '.png';
+        }
+        var ssPath = path.join(process.env.PWD, filename);
+        this
+          .saveScreenshot(ssPath).
+          call(function (e, r) {
+            console.log('Saved screenshot to', ssPath);
+            cb();
+          });
+      });
+  }
 
 
   function _startPhantom (port, next) {
