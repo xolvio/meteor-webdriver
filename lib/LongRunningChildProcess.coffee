@@ -66,10 +66,18 @@ class sanjo3.LongRunningChildProcess
   # Returns the pid of the main Meteor app process
   _getMeteorPid: ->
     parentPid = null
+    # For Meteor < 1.0.3
     parentPidIndex = _.indexOf(process.argv, '--parent-pid')
     if parentPidIndex != -1
       parentPid = process.argv[parentPidIndex + 1]
-    log.debug("The pid of the main Meteor app process is #{parentPid}")
+      log.debug("The pid of the main Meteor app process is #{parentPid}")
+      # For Meteor >= 1.0.3
+    else if process.env.METEOR_PARENT_PID
+      parentPid = process.env.METEOR_PARENT_PID
+      log.debug("The pid of the main Meteor app process is #{parentPid}")
+    else
+      log.error('Could not find the pid of the main Meteor app process')
+
     return parentPid
 
 
@@ -126,23 +134,19 @@ class sanjo3.LongRunningChildProcess
 
     logFile = @_getLogFilePath()
     fs.ensureDirSync(path.dirname(logFile))
-    @fout = fs.openSync(logFile, 'w')
+    #@fout = fs.openSync(logFile, 'w')
     #@ferr = fs.openSync(logFile, 'w')
 
-    spawnOptions = _.defaults(options.options, {
+    spawnOptions = {
       cwd: @_getMeteorAppPath(),
       env: process.env,
-      detached: true
-#      stdio: ['ignore', @fout, @fout]
-    })
-
-
+      detached: true,
+      stdio: ['ignore', 'pipe', 'pipe']
+    }
     command = path.basename options.command
     spawnScript = @_getSpawnScriptPath()
-    log.debug spawnScript
     commandArgs = [spawnScript, @_getMeteorPid(), options.command].concat(options.args)
     fs.chmodSync(spawnScript, 0o544)
-
 
     log.debug("LongRunningChildProcess.spawn is spawning '#{command}'")
 

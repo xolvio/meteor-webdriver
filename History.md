@@ -1,3 +1,7 @@
+#0.2.1 / 0.2.2
+
+* Add a PHANTOM_PATH environment variable to help with CI environments.
+
 #0.2.0
 
 * WebdriverIO can now run inside a mirror
@@ -12,7 +16,7 @@
 
 #0.1.6
 
-* Fixed issue in child process 
+* Fixed issue in child process
 
 #0.1.5
 
