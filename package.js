@@ -35,6 +35,9 @@
     ], 'server');
     api.addFiles(['lib/spawner.js'], 'server', {isAsset: true});
 
+    // PhantomJS Polyfills
+    api.add_files(['polyfills/url.js'], 'server', {isAsset: true});
+
     api.export('wdio', 'server');
   });
 

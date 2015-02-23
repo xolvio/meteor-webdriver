@@ -1,4 +1,4 @@
-/*jshint -W117, -W030, -W016 */
+/*jshint -W117, -W030, -W016, -W061 */
 /* global
  DEBUG:true,
  sanjo3:true
@@ -18,8 +18,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   var phantom = Npm.require('phantomjs'),
-      path = Npm.require('path'),
-      _screenshotCounter;
+    path = Npm.require('path'),
+    _screenshotCounter;
 
   var phantomPath;
 
@@ -38,7 +38,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   wdio.instance = Npm.require('webdriverio');
 
-  wdio.getGhostDriver = function (options, callback) {
+  wdio.getGhostDriver = Meteor.bindEnvironment(function (options, callback) {
 
     _screenshotCounter = 0;
 
@@ -49,14 +49,51 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     options = _.defaults(options, defaultOptions);
 
     DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
-    _startPhantom(options.port, function () {
+    _startPhantom(options.port, Meteor.bindEnvironment(function () {
       var browser = wdio.instance.remote(options);
+      _polyfillPhantom(browser);
       _augmentedBrowser(browser, options);
       callback(browser);
-    });
-  };
+    }));
+  });
 
-  function _augmentedBrowser (browser, options) {
+
+  function _polyfillPhantom(browser) {
+
+    var polyfills = [];
+    polyfills.push(Assets.getText('polyfills/url.js'));
+
+    var _url = browser.url;
+    browser.url = function () {
+
+      if (typeof arguments[arguments.length - 1] === 'function') {
+        // this is a URL retrieval so do nothing
+        return _url.apply(this, arguments);
+      }
+
+      var retVal = _url.apply(this, arguments);
+
+      _.each(polyfills, function (code, index) {
+        _applyPolyfill(code, index);
+      });
+
+      return retVal;
+    };
+
+  }
+
+  function _applyPolyfill(code, index) {
+    browser.execute(function (code) {
+      eval(code);
+    }, code, function (err, ret) {
+      if (err) {
+        throw new Error('Error applying polyfill ' + index + ', err');
+      }
+      DEBUG && console.log('Applied polyfill', index, ret);
+    });
+  }
+
+  function _augmentedBrowser(browser, options) {
     browser.
       addCommand('waitForPresent', function (selector, cb) {
         this
@@ -79,7 +116,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       addCommand('takeScreenshot', function (filename, cb) {
         if (typeof filename === 'function') {
           cb = filename;
-          filename = 'screenshot' + ++_screenshotCounter + '.png';
+          _screenshotCounter += 1;
+          filename = 'screenshot' + _screenshotCounter + '.png';
         }
         if (!filename.match(/\.png$/)) {
           filename += '.png';
@@ -87,7 +125,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         var ssPath = path.join(process.env.PWD, filename);
         this
           .saveScreenshot(ssPath).
-          call(function (e, r) {
+          call(function () {
             console.log('Saved screenshot to', ssPath);
             cb();
           });
@@ -95,7 +133,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
 
-  function _startPhantom (port, next) {
+  function _startPhantom(port, next) {
 
     var phantomChild = new sanjo3.LongRunningChildProcess('webdriver-phantom');
     if (phantomChild.isRunning()) {
