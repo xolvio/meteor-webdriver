@@ -65,31 +65,26 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var _url = browser.url;
     browser.url = function () {
-
       if (typeof arguments[arguments.length - 1] === 'function') {
-        // this is a URL retrieval so do nothing
+        // this is a URL get not a navigation so do nothing
         return _url.apply(this, arguments);
       }
-
       var retVal = _url.apply(this, arguments);
-
       _.each(polyfills, function (code, index) {
         _applyPolyfill(browser, code, index);
       });
-
       return retVal;
     };
-
   }
 
   function _applyPolyfill(browser, code, index) {
     browser.execute(function (code) {
       eval(code);
-    }, code, function (err, ret) {
+    }, code, function (err) {
       if (err) {
         throw new Error('Error applying polyfill ' + index + ', err');
       }
-      DEBUG && console.log('Applied polyfill', index, ret);
+      DEBUG && console.log('Applied polyfill', index);
     });
   }
 
@@ -143,7 +138,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
 
   }
-
 
   function _startPhantom(port, next) {
 
