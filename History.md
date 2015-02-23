@@ -1,3 +1,15 @@
+#0.3.0
+
+* Phantom polyfill capability
+* Added helper commands:
+    waitForPresent - Ensures elements exist and are visible
+    waitForAndClick - Runs a waitForPresent then clicks an element
+    takeScreenshot - adds some smarts over the standard saveScreenshot command
+    typeInto - Clicks an element then types keys
+* Automatically takes a screenshot when webdriver encounters an error
+* Bumped webdriver version 2.4.5
+* Bumped phantomjs version to 1.9.15
+
 #0.2.1 / 0.2.2
 
 * Add a PHANTOM_PATH environment variable to help with CI environments.

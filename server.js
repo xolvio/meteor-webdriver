@@ -74,7 +74,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       var retVal = _url.apply(this, arguments);
 
       _.each(polyfills, function (code, index) {
-        _applyPolyfill(code, index);
+        _applyPolyfill(browser, code, index);
       });
 
       return retVal;
@@ -82,7 +82,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   }
 
-  function _applyPolyfill(code, index) {
+  function _applyPolyfill(browser, code, index) {
     browser.execute(function (code) {
       eval(code);
     }, code, function (err, ret) {
@@ -94,6 +94,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   function _augmentedBrowser(browser, options) {
+
     browser.
       addCommand('waitForPresent', function (selector, cb) {
         this
@@ -107,19 +108,25 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           .click(selector)
           .call(cb);
       }).
-      addCommand('type', function (selector, value, cb) {
+      addCommand('typeInto', function (selector, value, cb) {
         this
           .click(selector)
           .keys(value)
           .call(cb);
       }).
       addCommand('takeScreenshot', function (filename, cb) {
+
         if (typeof filename === 'function') {
           cb = filename;
+          filename = null;
+        }
+
+        if (!filename) {
           _screenshotCounter += 1;
           filename = 'screenshot' + _screenshotCounter + '.png';
         }
-        if (!filename.match(/\.png$/)) {
+
+        if (!filename.match(/\.png$/) || !filename.match(/\.jpg$/)) {
           filename += '.png';
         }
         var ssPath = path.join(process.env.PWD, filename);
@@ -130,6 +137,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
             cb();
           });
       });
+
+    browser.on('error', function () {
+      browser.takeScreenshot('webdriver_error');
+    });
+
   }
 
 
