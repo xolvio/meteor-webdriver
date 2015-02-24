@@ -32,7 +32,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   var defaultOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},
     port: 4444,
-    logLevel: 'silent',
+    logLevel: 'error',
     implicitWait: 5000
   };
 
