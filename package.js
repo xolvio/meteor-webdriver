@@ -5,7 +5,7 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.3.0',
+    version: '0.3.1',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
@@ -13,6 +13,7 @@
   Npm.depends({
     'webdriverio': '2.4.5',
     'phantomjs': '1.9.15',
+    'colors': '1.0.3',
     'fs-extra': '0.12.0'
 
     // TODO add support for these

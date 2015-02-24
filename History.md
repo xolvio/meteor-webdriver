@@ -1,3 +1,7 @@
+#0.3.1
+
+* Improved error visibility and log-level
+
 #0.3.0
 
 * Phantom polyfill capability

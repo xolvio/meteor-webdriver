@@ -19,7 +19,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   var phantom = Npm.require('phantomjs'),
     path = Npm.require('path'),
-    _screenshotCounter;
+    colors = Npm.require('colors'),
+    _screenshotCounter = 0;
 
   var phantomPath;
 
@@ -32,15 +33,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   var defaultOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},
     port: 4444,
-    logLevel: 'silent',
+    logLevel: 'error',
     implicitWait: 5000
   };
 
   wdio.instance = Npm.require('webdriverio');
 
   wdio.getGhostDriver = Meteor.bindEnvironment(function (options, callback) {
-
-    _screenshotCounter = 0;
 
     if (typeof options === 'function') {
       callback = options;
@@ -128,13 +127,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         this
           .saveScreenshot(ssPath).
           call(function () {
-            console.log('Saved screenshot to', ssPath);
+            console.log(colors.cyan('\nSaved screenshot to ' + ssPath));
             cb();
           });
       });
 
-    browser.on('error', function () {
+    browser.on('error', function (errorMessage) {
       browser.takeScreenshot('webdriver_error');
+      console.error(JSON.parse(errorMessage.body.value.message).errorMessage);
     });
 
   }
