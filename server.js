@@ -17,8 +17,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
-  var phantom = Npm.require('phantomjs'),
-    path = Npm.require('path'),
+  var path = Npm.require('path'),
     colors = Npm.require('colors'),
     _screenshotCounter = 0;
 
@@ -27,7 +26,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   if (process.env.PHANTOM_PATH) {
     phantomPath = process.env.PHANTOM_PATH;
   } else {
-    phantomPath = phantom.path;
+    phantomPath = path.join(
+      process.env.OLDPWD, 'dev_bundle', 'lib', 'node_modules',
+      'phantomjs', 'lib', 'phantom', 'bin', 'phantomjs');
   }
 
   var defaultOptions = {
@@ -81,7 +82,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       eval(code);
     }, code, function (err) {
       if (err) {
-        throw new Error('Error applying polyfill ' + index + ', err');
+        console.error('Error applying polyfill ' + index + ', err');
       }
       DEBUG && console.log('Applied polyfill', index);
     });
@@ -116,8 +117,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         }
 
         if (!filename) {
-          _screenshotCounter += 1;
-          filename = 'screenshot' + _screenshotCounter + '.png';
+          filename = 'screenshot' + _getNextScreenshotNumber() + '.png';
         }
 
         if (!filename.match(/\.png$/) || !filename.match(/\.jpg$/)) {
@@ -133,10 +133,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       });
 
     browser.on('error', function (errorMessage) {
-      browser.takeScreenshot('webdriver_error');
-      console.error(JSON.parse(errorMessage.body.value.message).errorMessage);
+      browser.takeScreenshot('webdriver_error' + _getNextScreenshotNumber());
+      var message =
+        'Error: ' + errorMessage.body.value.class +
+        '\n' + JSON.parse(errorMessage.body.value.message).errorMessage;
+      console.error(message);
+      throw new Error(message);
     });
 
+  }
+
+  function _getNextScreenshotNumber() {
+    return '' + _screenshotCounter++;
   }
 
   function _startPhantom(port, next) {
@@ -148,6 +156,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       return;
     }
 
+    var killTimerSeconds = 10;
+    var killTimer = setTimeout(function () {
+      console.error('Phantom failed to start in', killTimerSeconds, ' seconds', phantomPath);
+      phantomChild.getChild().kill('SIGTERM');
+    }, killTimerSeconds * 1000);
+
     phantomChild.spawn({
       command: phantomPath,
       args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]
@@ -158,15 +172,28 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       var stdout = data.toString();
       DEBUG && console.log('[xolvio:webdriver][phantom output]', stdout);
       if (stdout.match(/running/i)) {
+        clearTimeout(killTimer);
         console.log('[xolvio:webdriver] PhantomJS started.');
         next();
       }
       else if (stdout.match(/Error/)) {
         console.error('[xolvio:webdriver] Error starting PhantomJS');
-        next(new Error(data));
+        // ignore the error as this
+        next();
       }
     });
     phantomChild.getChild().stdout.on('data', onPhantomData);
+
+    phantomChild.getChild().on('error', function (err) {
+      console.error('Error executing phantom at', phantomPath);
+      console.error(err.stack);
+    });
+
+
+    process.on('SIGTERM', function () {
+      phantomChild.getChild().kill('SIGTERM');
+    });
+
   }
 
 })();

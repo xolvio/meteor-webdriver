@@ -12,16 +12,12 @@
 
   Npm.depends({
     'webdriverio': '2.4.5',
-    'phantomjs': '1.9.15',
     'colors': '1.0.3',
     'fs-extra': '0.12.0'
 
     // TODO add support for these
     //'chai': '1.9.0'
     //'selenium-standalone': '2.43.1-5',
-
-    //'selenium-webdriver': '2.43.5',
-    //'wd': '0.3.9',
   });
 
   Package.onUse(function (api) {
