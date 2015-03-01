@@ -5,29 +5,27 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.3.1',
+    version: '0.4.0',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
 
   Npm.depends({
     'webdriverio': '2.4.5',
-    'colors': '1.0.3',
     'fs-extra': '0.12.0'
 
     // TODO add support for these
-    //'chai': '1.9.0'
+    //'chai': '2.0.0',
+    //'chai-as-promised': '4.2.0'
     //'selenium-standalone': '2.43.1-5',
   });
 
   Package.onUse(function (api) {
     api.use('underscore@1.0.2', 'server');
     api.use('coffeescript@1.0.4', 'server');
-    api.use('practicalmeteor:loglevel@1.1.0_2', 'server');
 
     api.addFiles([
       'lib/meteor/files.js',
-      'lib/LongRunningChildProcess.coffee',
       'server.js'
     ], 'server');
     api.addFiles(['lib/spawner.js'], 'server', {isAsset: true});

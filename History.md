@@ -1,3 +1,11 @@
+#0.4.0
+
+* Compromised speed for stability in this release
+* Now uses the same phantomjs as the installed meteor tools (no npm download!)
+* Reworked phantomjs spwaning so that it kills all phantomjs processes prior to starting (kill -9 so beware!)
+* Rewrote the screen grabbing on-error to maintain the event chain (plays nicer with cucumber)
+* Reduced (eliminated?) restarts when a webdriver error is encountered
+
 #0.3.1
 
 * Improved error visibility and log-level

@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "colors": {
-      "version": "1.0.3"
-    },
     "fs-extra": {
       "version": "0.12.0",
       "dependencies": {

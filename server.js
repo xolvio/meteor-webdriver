@@ -1,10 +1,7 @@
 /*jshint -W117, -W030, -W016, -W061 */
 /* global
  DEBUG:true,
- sanjo3:true
  */
-
-log = loglevel.createPackageLogger('[xolvio:webdriver]', process.env.WEBDRIVER_LOG_LEVEL || 'info');
 
 wdio = {};
 
@@ -18,15 +15,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   var path = Npm.require('path'),
-    colors = Npm.require('colors'),
+    spawn = Npm.require('child_process').spawn,
     _screenshotCounter = 0;
 
-  var phantomPath;
+  var _phantomPath;
 
   if (process.env.PHANTOM_PATH) {
-    phantomPath = process.env.PHANTOM_PATH;
+    _phantomPath = process.env.PHANTOM_PATH;
   } else {
-    phantomPath = path.join(
+    _phantomPath = path.join(
       process.env.OLDPWD, 'dev_bundle', 'lib', 'node_modules',
       'phantomjs', 'lib', 'phantom', 'bin', 'phantomjs');
   }
@@ -40,7 +37,20 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   wdio.instance = Npm.require('webdriverio');
 
-  wdio.getGhostDriver = Meteor.bindEnvironment(function (options, callback) {
+  wdio.startPhantom = Meteor.bindEnvironment(function (options, callback) {
+
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+
+    wdio.killAllPhantomProcesses(function () {
+      _startPhantom(options.port, callback);
+    });
+
+  });
+
+  wdio.getGhostDriverRemote = Meteor.bindEnvironment(function (options, callback) {
 
     if (typeof options === 'function') {
       callback = options;
@@ -49,14 +59,28 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     options = _.defaults(options, defaultOptions);
 
     DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
-    _startPhantom(options.port, Meteor.bindEnvironment(function () {
-      var browser = wdio.instance.remote(options);
-      _polyfillPhantom(browser);
-      _augmentedBrowser(browser, options);
-      callback(browser);
-    }));
+    var browser = wdio.instance.remote(options);
+    _polyfillPhantom(browser);
+    _augmentedBrowser(browser, options);
+    callback(browser);
   });
 
+  wdio.getGhostDriver = Meteor.bindEnvironment(function (options, callback) {
+
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+
+    wdio.startPhantom(options, function () {
+      wdio.getGhostDriverRemote(options, callback);
+    });
+
+  });
+
+  wdio.killAllPhantomProcesses = function (callback) {
+    spawn('pkill', ['-9', 'phantomjs']).on('close', Meteor.bindEnvironment(callback));
+  };
 
   function _polyfillPhantom(browser) {
 
@@ -109,37 +133,51 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           .keys(value)
           .call(cb);
       }).
-      addCommand('takeScreenshot', function (filename, cb) {
+      addCommand('takeScreenshot', function (filename, silent, cb) {
 
         if (typeof filename === 'function') {
           cb = filename;
           filename = null;
         }
 
+        if (typeof silent === 'function') {
+          cb = silent;
+          silent = false;
+        }
+
         if (!filename) {
           filename = 'screenshot' + _getNextScreenshotNumber() + '.png';
         }
 
-        if (!filename.match(/\.png$/) || !filename.match(/\.jpg$/)) {
+        if (!filename.match(/\.png$/) && !filename.match(/\.jpg$/)) {
           filename += '.png';
         }
         var ssPath = path.join(process.env.PWD, filename);
         this
           .saveScreenshot(ssPath).
           call(function () {
-            console.log(colors.cyan('\nSaved screenshot to ' + ssPath));
+            if (!silent) {
+              console.log('\nSaved screenshot to ' + ssPath);
+            }
             cb();
           });
       });
 
-    browser.on('error', function (errorMessage) {
-      browser.takeScreenshot('webdriver_error' + _getNextScreenshotNumber());
-      var message =
-        'Error: ' + errorMessage.body.value.class +
-        '\n' + JSON.parse(errorMessage.body.value.message).errorMessage;
-      console.error(message);
-      throw new Error(message);
-    });
+
+    var listener = function (e) {
+
+      if (e.body) {
+        // only take screenshot if error has a body (means it's from a page)
+        var screenshotName = 'webdriver_error_' + _getNextScreenshotNumber() + '.png';
+        browser.takeScreenshot(screenshotName, true);
+        console.error('Captured error screenshot at ' +
+        path.join(process.env.PWD, screenshotName));
+      }
+
+      this.removeListener('error', listener);
+      this.emit('error', e);
+    };
+    browser.on('error', listener);
 
   }
 
@@ -149,49 +187,46 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _startPhantom(port, next) {
 
-    var phantomChild = new sanjo3.LongRunningChildProcess('webdriver-phantom');
-    if (phantomChild.isRunning()) {
-      DEBUG && console.log('[xolvio:webdriver] Phantom is already running, not starting a new one');
-      next();
-      return;
-    }
+    var phantomChild = spawn(_phantomPath, ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]);
 
-    var killTimerSeconds = 10;
-    var killTimer = setTimeout(function () {
-      console.error('Phantom failed to start in', killTimerSeconds, ' seconds', phantomPath);
-      phantomChild.getChild().kill('SIGTERM');
-    }, killTimerSeconds * 1000);
-
-    phantomChild.spawn({
-      command: phantomPath,
-      args: ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]
-    });
+    var phantomStartupTimeout = 5;
+    var phantomStartupTimer = setTimeout(function () {
+      console.error('Phantom failed to start in', phantomStartupTimeout, ' seconds', _phantomPath);
+      phantomChild.kill('SIGTERM');
+      throw new Error('Phantom failed to start');
+    }, phantomStartupTimeout * 1000);
 
     DEBUG && console.log('[xolvio:webdriver] Starting Phantom.');
     var onPhantomData = Meteor.bindEnvironment(function (data) {
       var stdout = data.toString();
       DEBUG && console.log('[xolvio:webdriver][phantom output]', stdout);
       if (stdout.match(/running/i)) {
-        clearTimeout(killTimer);
-        console.log('[xolvio:webdriver] PhantomJS started.');
+        clearTimeout(phantomStartupTimer);
+        DEBUG && console.log('[xolvio:webdriver] PhantomJS started.');
         next();
       }
       else if (stdout.match(/Error/)) {
         console.error('[xolvio:webdriver] Error starting PhantomJS');
-        // ignore the error as this
         next();
       }
     });
-    phantomChild.getChild().stdout.on('data', onPhantomData);
+    phantomChild.stdout.on('data', onPhantomData);
 
-    phantomChild.getChild().on('error', function (err) {
-      console.error('Error executing phantom at', phantomPath);
+    phantomChild.on('error', function (err) {
+      console.error('Error executing phantom at', _phantomPath);
       console.error(err.stack);
     });
 
-
     process.on('SIGTERM', function () {
-      phantomChild.getChild().kill('SIGTERM');
+      phantomChild.kill('SIGKILL');
+    });
+
+    process.on('SIGINT', function () {
+      phantomChild.kill('SIGKILL');
+    });
+
+    process.on('SIGHUP', function () {
+      phantomChild.kill('SIGKILL');
     });
 
   }
