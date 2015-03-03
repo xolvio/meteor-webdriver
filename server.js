@@ -217,15 +217,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       console.error(err.stack);
     });
 
-    process.on('SIGTERM', function () {
-      phantomChild.kill('SIGKILL');
-    });
-
-    process.on('SIGINT', function () {
-      phantomChild.kill('SIGKILL');
-    });
-
-    process.on('SIGHUP', function () {
+    process.on('exit', function () {
       phantomChild.kill('SIGKILL');
     });
 
