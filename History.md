@@ -1,3 +1,11 @@
+#0.5.2
+
+* Increased phantom startup timeout
+
+#0.5.1
+
+* Fixed chrome driver npm path issue
+
 #0.5.0
 
 * Added ChromeDriver support

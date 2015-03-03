@@ -247,7 +247,7 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
     var phantomChild = spawn(_phantomPath, ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]);
     DEBUG && console.log('[xolvio:webdriver] Spawned phantom process with pid', phantomChild.pid, 'on port', port);
 
-    var phantomStartupTimeout = 5;
+    var phantomStartupTimeout = 20;
     var phantomStartupTimer = setTimeout(function () {
       console.error('Phantom failed to start in', phantomStartupTimeout, ' seconds', _phantomPath);
       phantomChild.kill('SIGKILL');
