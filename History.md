@@ -1,3 +1,10 @@
+#0.4.1
+
+* Added DEBUG_WEBDRIVER for only showing webdriver debug logs
+* Fixed false error reporting from phantom process
+* Made phantom poly-filling synchronous
+* Added debugging messages
+
 #0.4.0
 
 * Compromised speed for stability in this release

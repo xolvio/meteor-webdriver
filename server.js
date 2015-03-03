@@ -5,7 +5,7 @@
 
 wdio = {};
 
-DEBUG = !!process.env.VELOCITY_DEBUG;
+DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
 
 (function () {
   'use strict';
@@ -17,6 +17,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   var path = Npm.require('path'),
     spawn = Npm.require('child_process').spawn,
     _screenshotCounter = 0;
+
+  wdio.chromedriver = Npm.require('chromedriver');
 
   var _phantomPath;
 
@@ -52,25 +54,30 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   wdio.getGhostDriverRemote = Meteor.bindEnvironment(function (options, callback) {
 
+    DEBUG && console.log('[xolvio:webdriver] getGhostDriverRemote called');
+
     if (typeof options === 'function') {
       callback = options;
       options = {};
     }
     options = _.defaults(options, defaultOptions);
-
-    DEBUG && console.log('[xolvio:webdriver]', 'getGhostDriver called');
+    DEBUG && console.log('[xolvio:webdriver] getGhostDriverRemote options', options);
     var browser = wdio.instance.remote(options);
     _polyfillPhantom(browser);
     _augmentedBrowser(browser, options);
+    DEBUG && console.log('[xolvio:webdriver] finished getGhostDriverRemote');
     callback(browser);
   });
 
   wdio.getGhostDriver = Meteor.bindEnvironment(function (options, callback) {
 
+    DEBUG && console.log('[xolvio:webdriver] getGhostDriver called');
+
     if (typeof options === 'function') {
       callback = options;
       options = {};
     }
+    options = _.defaults(options, defaultOptions);
 
     wdio.startPhantom(options, function () {
       wdio.getGhostDriverRemote(options, callback);
@@ -84,6 +91,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _polyfillPhantom(browser) {
 
+    DEBUG && console.log('[xolvio:webdriver] Applying phantom polyfills');
     var polyfills = [];
     polyfills.push(Assets.getText('polyfills/url.js'));
 
@@ -95,13 +103,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       }
       var retVal = _url.apply(this, arguments);
       _.each(polyfills, function (code, index) {
-        _applyPolyfill(browser, code, index);
+        Meteor.wrapAsync(_applyPolyfill, browser, code, index);
       });
       return retVal;
     };
+    DEBUG && console.log('[xolvio:webdriver] Done applying phantom polyfills');
   }
 
-  function _applyPolyfill(browser, code, index) {
+  function _applyPolyfill(browser, code, index, callback) {
     browser.execute(function (code) {
       eval(code);
     }, code, function (err) {
@@ -109,10 +118,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         console.error('Error applying polyfill ' + index + ', err');
       }
       DEBUG && console.log('Applied polyfill', index);
+      callback();
     });
   }
 
   function _augmentedBrowser(browser, options) {
+
+    DEBUG && console.log('[xolvio:webdriver] Augmenting browser functions');
 
     browser.
       addCommand('waitForPresent', function (selector, cb) {
@@ -165,7 +177,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 
     var listener = function (e) {
-
+      DEBUG && console.log('[xolvio:webdriver] browser.on("error") listener heard', e);
       if (e.body) {
         // only take screenshot if error has a body (means it's from a page)
         var screenshotName = 'webdriver_error_' + _getNextScreenshotNumber() + '.png';
@@ -173,11 +185,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         console.error('Captured error screenshot at ' +
         path.join(process.env.PWD, screenshotName));
       }
-
+      DEBUG && console.log('[xolvio:webdriver] Removing browser.on("error") listener');
       this.removeListener('error', listener);
       this.emit('error', e);
     };
     browser.on('error', listener);
+
+    DEBUG && console.log('[xolvio:webdriver] Finished augmenting browser functions');
 
   }
 
@@ -185,31 +199,34 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return '' + _screenshotCounter++;
   }
 
-  function _startPhantom(port, next) {
+
+  var _startPhantom = _.debounce(Meteor.bindEnvironment(__startPhantom));
+
+  function __startPhantom(port, next) {
+
+    DEBUG && console.log('[xolvio:webdriver] Entering _startPhantom');
 
     var phantomChild = spawn(_phantomPath, ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]);
+    DEBUG && console.log('[xolvio:webdriver] Spawned phantom process with pid', phantomChild.pid, 'on port', port);
 
     var phantomStartupTimeout = 5;
     var phantomStartupTimer = setTimeout(function () {
       console.error('Phantom failed to start in', phantomStartupTimeout, ' seconds', _phantomPath);
-      phantomChild.kill('SIGTERM');
+      phantomChild.kill('SIGKILL');
       throw new Error('Phantom failed to start');
     }, phantomStartupTimeout * 1000);
 
-    DEBUG && console.log('[xolvio:webdriver] Starting Phantom.');
     var onPhantomData = Meteor.bindEnvironment(function (data) {
       var stdout = data.toString();
       DEBUG && console.log('[xolvio:webdriver][phantom output]', stdout);
       if (stdout.match(/running/i)) {
         clearTimeout(phantomStartupTimer);
+        phantomChild.stdout.removeListener('error', onPhantomData);
         DEBUG && console.log('[xolvio:webdriver] PhantomJS started.');
         next();
       }
-      else if (stdout.match(/Error/)) {
-        console.error('[xolvio:webdriver] Error starting PhantomJS');
-        next();
-      }
     });
+
     phantomChild.stdout.on('data', onPhantomData);
 
     phantomChild.on('error', function (err) {
@@ -217,9 +234,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       console.error(err.stack);
     });
 
-    process.on('exit', function () {
-      phantomChild.kill('SIGKILL');
-    });
+    DEBUG && console.log('[xolvio:webdriver] Exiting _startPhantom');
 
   }
 

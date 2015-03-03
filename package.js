@@ -5,14 +5,15 @@
   Package.describe({
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
-    version: '0.4.0',
+    version: '0.4.1',
     git: 'git@github.com:xolvio/meteor-webdriver.git',
     debugOnly: true
   });
 
   Npm.depends({
     'webdriverio': '2.4.5',
-    'fs-extra': '0.12.0'
+    'fs-extra': '0.12.0'//,
+    //'chromedriver': '2.14.1'
 
     // TODO add support for these
     //'chai': '2.0.0',
