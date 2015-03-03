@@ -41,6 +41,27 @@ describe('Browser testing', function(done) {
 });
 
 ```
+You can also use ChromeDriver like this (no need to download anything!):
+
+```javascript
+
+describe('Browser testing', function(done) {
+
+  var _browser;
+
+  before(function(done) {
+    wdio.getChromeDriver(function(browser) {
+      _browser = browser;
+      done();
+    });
+  })
+
+  // see above
+
+});
+
+```
+
 
 For more examples and usage, see the [webdriver.io website](http://webdriver.io).
 
@@ -54,8 +75,8 @@ and then set `PHANTOM_PATH` as an environment variable when you run your Meteor 
 
 - [x] [WebdriverIO](http://webdriver.io)
 - [x] Use PhantomJS in GhostDriver mode
-- [ ] Automatically Download [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) /
-[Selenium Server](http://www.seleniumhq.org/download/)
+- [x] Automatically Download [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver)
+- [x] Automatically Download [Selenium Server](http://www.seleniumhq.org/download/)
 - [ ] Reuse the selenium webdriver session between tests so the browser does not flicker on and off
 - [ ] Support multiple window testing
 - [ ] Specify the browser matrix to run in development

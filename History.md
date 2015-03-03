@@ -1,3 +1,11 @@
+#0.5.0
+
+* Added ChromeDriver support
+
+#0.4.2
+
+* Fixed ChromeDriver issue (early commit!)
+
 #0.4.1
 
 * Added DEBUG_WEBDRIVER for only showing webdriver debug logs

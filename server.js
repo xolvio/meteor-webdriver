@@ -19,7 +19,7 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
     _screenshotCounter = 0;
 
   wdio.chromedriver = Npm.require('chromedriver');
-
+  wdio.instance = Npm.require('webdriverio');
   var _phantomPath;
 
   if (process.env.PHANTOM_PATH) {
@@ -30,26 +30,63 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
       'phantomjs', 'lib', 'phantom', 'bin', 'phantomjs');
   }
 
-  var defaultOptions = {
+  var defaultPhantomOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},
     port: 4444,
-    logLevel: 'error',
+    logLevel: 'silent',
     implicitWait: 5000
   };
 
-  wdio.instance = Npm.require('webdriverio');
+  var defaultChromeDriverOptions = {
+    host: 'localhost',
+    port: 9515,
+    logLevel: 'silent',
+    desiredCapabilities: {
+      browserName: 'chrome'
+    }
+  };
 
-  wdio.startPhantom = Meteor.bindEnvironment(function (options, callback) {
+  wdio.startChromeDriver = Meteor.bindEnvironment(function (callback) {
+    DEBUG && console.log('[xolvio:webdriver] startChromeDriver called');
+    wdio.killAllProcesses('chromedriver', function () {
+      _startChromeDriver(callback);
+    });
+  });
 
+  wdio.getChromeDriverRemote = Meteor.bindEnvironment(function (options, callback) {
+    DEBUG && console.log('[xolvio:webdriver] getGhostDriverRemote called');
     if (typeof options === 'function') {
       callback = options;
       options = {};
     }
+    options = _.defaults(options, defaultPhantomOptions);
+    DEBUG && console.log('[xolvio:webdriver] getChromeDriverRemote options', options);
+    var browser = wdio.instance.remote(options);
+    _augmentedBrowser(browser, options);
+    DEBUG && console.log('[xolvio:webdriver] finished getChromeDriverRemote');
+    callback(browser);
+  });
 
-    wdio.killAllPhantomProcesses(function () {
+  wdio.getChromeDriver = Meteor.bindEnvironment(function (options, callback) {
+    DEBUG && console.log('[xolvio:webdriver] getChromeDriver called');
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    options = _.defaults(options, defaultChromeDriverOptions);
+    wdio.startChromeDriver(function () {
+      wdio.getChromeDriverRemote(options, callback);
+    });
+  });
+
+  wdio.startPhantom = Meteor.bindEnvironment(function (options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    wdio.killAllProcesses('phantomjs', function () {
       _startPhantom(options.port, callback);
     });
-
   });
 
   wdio.getGhostDriverRemote = Meteor.bindEnvironment(function (options, callback) {
@@ -60,7 +97,7 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
       callback = options;
       options = {};
     }
-    options = _.defaults(options, defaultOptions);
+    options = _.defaults(options, defaultPhantomOptions);
     DEBUG && console.log('[xolvio:webdriver] getGhostDriverRemote options', options);
     var browser = wdio.instance.remote(options);
     _polyfillPhantom(browser);
@@ -77,7 +114,7 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
       callback = options;
       options = {};
     }
-    options = _.defaults(options, defaultOptions);
+    options = _.defaults(options, defaultPhantomOptions);
 
     wdio.startPhantom(options, function () {
       wdio.getGhostDriverRemote(options, callback);
@@ -85,8 +122,8 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
 
   });
 
-  wdio.killAllPhantomProcesses = function (callback) {
-    spawn('pkill', ['-9', 'phantomjs']).on('close', Meteor.bindEnvironment(callback));
+  wdio.killAllProcesses = function (procName, callback) {
+    spawn('pkill', ['-9', procName]).on('close', Meteor.bindEnvironment(callback));
   };
 
   function _polyfillPhantom(browser) {
@@ -206,6 +243,7 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
 
     DEBUG && console.log('[xolvio:webdriver] Entering _startPhantom');
 
+    DEBUG && console.log('[xolvio:webdriver] Spawning phantom process binary', _phantomPath);
     var phantomChild = spawn(_phantomPath, ['--ignore-ssl-errors', 'yes', '--webdriver', '' + port]);
     DEBUG && console.log('[xolvio:webdriver] Spawned phantom process with pid', phantomChild.pid, 'on port', port);
 
@@ -226,7 +264,6 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
         next();
       }
     });
-
     phantomChild.stdout.on('data', onPhantomData);
 
     phantomChild.on('error', function (err) {
@@ -234,7 +271,48 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
       console.error(err.stack);
     });
 
-    DEBUG && console.log('[xolvio:webdriver] Exiting _startPhantom');
+    DEBUG && console.log('[xolvio:webdriver] Finished _startPhantom');
+
+  }
+
+
+  var _startChromeDriver = _.debounce(Meteor.bindEnvironment(__startChromeDriver));
+
+  function __startChromeDriver(next) {
+
+    DEBUG && console.log('[xolvio:webdriver] Entering _startChromeDriver');
+
+    var chromeDriverBinPath = wdio.chromedriver.path;
+
+    DEBUG && console.log('[xolvio:webdriver] Spawning phantom process binary', chromeDriverBinPath);
+    var chromeDriverChild = spawn(chromeDriverBinPath, ['--url-base=/wd/hub']);
+    DEBUG && console.log('[xolvio:webdriver] Spawned phantom process with pid', chromeDriverChild.pid);
+
+    var chromeDriverStartupTimeout = 5;
+    var chromeDriverStartupTimer = setTimeout(function () {
+      console.error('ChromeDriver failed to start in', chromeDriverStartupTimeout, ' seconds', chromeDriverBinPath);
+      chromeDriverChild.kill('SIGKILL');
+      throw new Error('Phantom failed to start');
+    }, chromeDriverStartupTimeout * 1000);
+
+    var onChromeDriverData = Meteor.bindEnvironment(function (data) {
+      var stdout = data.toString();
+      DEBUG && console.log('[xolvio:webdriver][chromedriver output]', stdout);
+      if (stdout.match(/Only local connections are allowed/)) {
+        clearTimeout(chromeDriverStartupTimer);
+        chromeDriverChild.stdout.removeListener('error', onChromeDriverData);
+        DEBUG && console.log('[xolvio:webdriver] ChromeDriver started.');
+        next();
+      }
+    });
+    chromeDriverChild.stdout.on('data', onChromeDriverData);
+
+    chromeDriverChild.on('error', function (err) {
+      console.error('Error executing ChromeDriver at', chromeDriverBinPath);
+      console.error(err.stack);
+    });
+
+    DEBUG && console.log('[xolvio:webdriver] Finished _startChromeDriver');
 
   }
 
