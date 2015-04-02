@@ -16,19 +16,12 @@ DEBUG = !!process.env.WEBDRIVER_DEBUG || !!process.env.VELOCITY_DEBUG;
 
   var path = Npm.require('path'),
     spawn = Npm.require('child_process').spawn,
+    phantomjs = Npm.require('phantomjs-bin'),
     _screenshotCounter = 0;
 
   wdio.chromedriver = Npm.require('chromedriver');
   wdio.instance = Npm.require('webdriverio');
-  var _phantomPath;
-
-  if (process.env.PHANTOM_PATH) {
-    _phantomPath = process.env.PHANTOM_PATH;
-  } else {
-    _phantomPath = path.join(
-      process.env.OLDPWD, 'dev_bundle', 'lib', 'node_modules',
-      'phantomjs', 'lib', 'phantom', 'bin', 'phantomjs');
-  }
+  var _phantomPath = process.env.PHANTOM_PATH || phantomjs.path;
 
   var defaultPhantomOptions = {
     desiredCapabilities: {browserName: 'PhantomJs'},

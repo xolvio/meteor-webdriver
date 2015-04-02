@@ -13,7 +13,8 @@
   Npm.depends({
     'webdriverio': '2.4.5',
     'fs-extra': '0.12.0',
-    'chromedriver': '2.14.1'
+    'chromedriver': '2.14.1',
+    'phantomjs-bin': '1.0.1'
 
     // TODO add support for these
     //'chai': '2.0.0',
