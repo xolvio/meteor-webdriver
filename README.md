@@ -6,6 +6,13 @@ A [webdriverIO](http://webdriver.io) for UI testing using any testing framework.
 1. Starts PhantomJS in webdriver mode
 2. Provides you with a browser you can automate using the industry standard Selenium Webdriver
 
+#Get the Book
+To learn more about testing with Meteor, consider purchasing our book [The Meteor Testing Manual](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver).
+
+[![](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver)
+
+Your support helps us continue our work on Velocity and related frameworks.
+
 ##Installation
 
 ```sh
