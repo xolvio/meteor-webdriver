@@ -21,6 +21,8 @@ meteor add xolvio:webdriver
 
 ## Usage
 
+The following examples are for Mocha. You can also [use Webdriver.io with Jasmine](https://github.com/Sanjo/meteor-jasmine/wiki/End-to-End-Tests).
+
 ```javascript
 
 describe('Browser testing', function(done) {
