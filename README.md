@@ -9,7 +9,7 @@ A [WebdriverIO](http://webdriver.io) wrapper for UI testing using any testing fr
 # Get the Book
 To learn more about testing with Meteor, consider purchasing our book [The Meteor Testing Manual](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver).
 
-[![Meteor Testing book](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver)
+[![Meteor Testing Manual](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver)
 
 Your support helps us continue our work on Velocity and related frameworks.
 
