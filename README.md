@@ -1,19 +1,19 @@
 meteor-webdriver
 ================
 
-A [webdriverIO](http://webdriver.io) for UI testing using any testing framework.
+A [WebdriverIO](http://webdriver.io) wrapper for UI testing using any testing framework.
 
 1. Starts PhantomJS in webdriver mode
-2. Provides you with a browser you can automate using the industry standard Selenium Webdriver
+2. Provides you with a browser you can automate using the industry-standard Selenium Webdriver
 
-#Get the Book
+# Get the Book
 To learn more about testing with Meteor, consider purchasing our book [The Meteor Testing Manual](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver).
 
-[![](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver)
+[![Meteor Testing book](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=webdriver&utm_medium=banner&utm_campaign=webdriver)
 
 Your support helps us continue our work on Velocity and related frameworks.
 
-##Installation
+## Installation
 
 ```sh
 meteor add xolvio:webdriver
@@ -29,14 +29,14 @@ describe('Browser testing', function(done) {
 
   var _browser;
 
-  before(function(done) {
+  before(function (done) {
     wdio.getGhostDriver(function(browser) {
       _browser = browser;
       done();
     });
   })
 
-  it('should have the correct title', function(done) {
+  it('should have the correct title', function (done) {
     _browser.
       init().
       url('http://www.google.com').
@@ -54,12 +54,12 @@ You can also use ChromeDriver like this (no need to download anything!):
 
 ```javascript
 
-describe('Browser testing', function(done) {
+describe('Browser testing', function (done) {
 
   var _browser;
 
   before(function(done) {
-    wdio.getChromeDriver(function(browser) {
+    wdio.getChromeDriver(function (browser) {
       _browser = browser;
       done();
     });
