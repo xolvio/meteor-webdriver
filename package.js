@@ -6,7 +6,7 @@
     name: 'xolvio:webdriver',
     summary: 'Webdriver.io for Meteor',
     version: '0.5.2',
-    git: 'git@github.com:xolvio/meteor-webdriver.git',
+    git: 'https://github.com/xolvio/meteor-webdriver.git',
     debugOnly: true
   });
 
