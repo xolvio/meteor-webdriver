@@ -1,7 +1,7 @@
 meteor-webdriver
 ================
 
-# THIS PACKAGE IS NO LONGER MAINTAINED
+*THIS PACKAGE IS NO LONGER MAINTAINED*
 Use at your own risk :) You might consider using meteor-cucumber instead.
 We plan to put end-to-end testing inside Jasmine in the near future, you can speed this up by sponsoring this release. [See this page for details](http://xolv.io/services/velocity-premium-support/)
 
