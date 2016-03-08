@@ -1,7 +1,7 @@
 meteor-webdriver
 ================
 
-## THIS PACKAGE IS NO LONGER MAINTAINED Use at your own risk :) You might consider using Chimp instead.
+## THIS PACKAGE IS NO LONGER MAINTAINED Use at your own risk :) You might consider using [Chimp](https://github.com/xolvio/chimp) instead.
 We plan to put end-to-end testing inside Jasmine in the near future, you can speed this up by sponsoring this release. [See this page for details](http://xolv.io/services/velocity-premium-support/)
 
 A [WebdriverIO](http://webdriver.io) wrapper for UI testing using any testing framework.
